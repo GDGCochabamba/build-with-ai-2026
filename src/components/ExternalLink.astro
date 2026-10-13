@@ -1,0 +1,28 @@
+---
+interface Props {
+  href: string;
+  class?: string;
+  compact?: boolean;
+  label?: string;
+}
+const { href, class: className, compact = false, label } = Astro.props;
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={label ? `${label} (se abre en otra pestaña)` : undefined}
+  class:list={[
+    "inline-flex items-center gap-2 font-medium text-link underline-offset-4 hover:underline",
+    !compact && "rounded-full border border-line bg-white px-5 py-2.5 hover:no-underline hover:border-link",
+    compact && "text-sm whitespace-nowrap",
+    className,
+  ]}
+>
+  <slot />
+  {!label && <span class="sr-only">(se abre en otra pestaña)</span>}
+  <svg aria-hidden="true" viewBox="0 0 20 20" class="size-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8">
+    <path d="M8 4H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3M11 4h5v5M16 4l-7 7" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</a>

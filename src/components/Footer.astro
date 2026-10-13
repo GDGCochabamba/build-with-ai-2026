@@ -1,0 +1,40 @@
+---
+import type { Venue } from "../lib/event";
+
+interface Props {
+  venue: Venue | null;
+}
+const { venue } = Astro.props;
+---
+
+<footer class="border-t border-line bg-white">
+  <div class="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-8 md:grid-cols-2">
+    {
+      venue && (
+        <div>
+          <h2 class="text-xl font-bold">Sede</h2>
+          <p class="mt-3">
+            Todos los encuentros fueron en {venue.name}, {venue.address}, {venue.city}.
+          </p>
+          {venue.mapUrl && (
+            <a href={venue.mapUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-block font-medium text-link underline-offset-4 hover:underline">
+              Abrir en Google Maps<span class="sr-only"> (se abre en otra pestaña)</span>
+            </a>
+          )}
+        </div>
+      )
+    }
+    <div>
+      <a href="https://gdg.com.bo" class="inline-flex items-center gap-3 font-bold">
+        <img src="/gdg-icon.svg" alt="" class="h-7 w-auto" />
+        GDG Cochabamba
+      </a>
+      <p class="mt-3 text-muted">Build with AI es una iniciativa de Google Developer Groups que organizamos en Cochabamba.</p>
+      <ul class="mt-4 flex flex-wrap gap-x-6 gap-y-2 font-medium text-link">
+        <li><a href="https://gdg.com.bo" class="underline-offset-4 hover:underline">gdg.com.bo</a></li>
+        <li><a href="https://gdg.community.dev/gdg-cochabamba/" target="_blank" rel="noopener noreferrer" class="underline-offset-4 hover:underline">Comunidad en gdg.community.dev</a></li>
+        <li><a href="https://build-with-ai-bol.web.app" class="underline-offset-4 hover:underline">Edición 2025</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

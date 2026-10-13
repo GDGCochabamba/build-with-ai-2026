@@ -1,0 +1,69 @@
+---
+import type { Member } from "../lib/event";
+
+interface Props {
+  speakers: (Member & { sessionTitles: string[] })[];
+  organizers: Member[];
+}
+const { speakers, organizers } = Astro.props;
+
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("");
+---
+
+{
+  speakers.length > 0 && (
+    <section aria-labelledby="speakers" class="border-t border-line">
+      <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <h2 id="speakers" class="text-3xl font-bold tracking-tight sm:text-4xl">Speakers</h2>
+        <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+          {speakers.map((sp) => (
+            <li>
+              {sp.person.photoUrl ? (
+                <img src={sp.person.photoUrl} alt="" loading="lazy" class="aspect-square w-full max-w-40 rounded-full bg-line object-cover" />
+              ) : (
+                <span class="grid aspect-square w-full max-w-40 place-items-center rounded-full bg-line text-3xl font-bold" aria-hidden="true">
+                  {initials(sp.person.name)}
+                </span>
+              )}
+              <p class="mt-4 leading-tight font-bold">{sp.person.name}</p>
+              {sp.role && <p class="mt-1 text-sm text-muted">{sp.role}</p>}
+              {sp.sessionTitles.length > 0 && <p class="mt-2 text-sm">{sp.sessionTitles.join(", ")}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+{
+  organizers.length > 0 && (
+    <section id="equipo" aria-labelledby="equipo-titulo" class="scroll-mt-8 border-t border-line">
+      <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <h2 id="equipo-titulo" class="text-3xl font-bold tracking-tight sm:text-4xl">Equipo organizador</h2>
+        <ul class="mt-10 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+          {organizers.map((o) => (
+            <li class="flex items-center gap-4">
+              {o.person.photoUrl ? (
+                <img src={o.person.photoUrl} alt="" loading="lazy" class="size-14 shrink-0 rounded-full bg-line object-cover" />
+              ) : (
+                <span class="grid size-14 shrink-0 place-items-center rounded-full bg-line font-bold" aria-hidden="true">
+                  {initials(o.person.name)}
+                </span>
+              )}
+              <span class="leading-tight">
+                <span class="block font-medium">{o.person.name}</span>
+                {o.role && <span class="block text-sm text-muted">{o.role}</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}

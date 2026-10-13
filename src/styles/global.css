@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f8fafd;
+  --color-ink: #202124;
+  --color-muted: #5f6368;
+  --color-line: #dadce0;
+  --color-link: #1a73e8;
+  --color-gemini-blue: #4285f4;
+  --color-gemini-violet: #9b72cb;
+  --color-gemini-rose: #d96570;
+  --font-sans: "Schibsted Grotesk", system-ui, sans-serif;
+}
+
+:root {
+  --route-gradient: linear-gradient(90deg, #4285f4 0%, #9b72cb 55%, #d96570 100%);
+  --route-gradient-vertical: linear-gradient(180deg, #4285f4 0%, #9b72cb 55%, #d96570 100%);
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

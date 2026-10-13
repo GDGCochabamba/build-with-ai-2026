@@ -1,0 +1,149 @@
+---
+import { day, month, weekday, timeRange, isoDate, type Member, type Stop } from "../lib/event";
+import ExternalLink from "./ExternalLink.astro";
+
+interface Props {
+  stops: Stop[];
+  organizers: Member[];
+  venueName?: string;
+}
+const { stops, organizers, venueName } = Astro.props;
+
+const COLORS = ["var(--color-gemini-blue)", "var(--color-gemini-violet)", "var(--color-gemini-rose)"];
+const colorFor = (i: number) => COLORS[Math.round((i / Math.max(1, stops.length - 1)) * (COLORS.length - 1))];
+---
+
+<section aria-labelledby="recorrido" class="mx-auto max-w-6xl px-5 pb-24 sm:px-8">
+  <h2 id="recorrido" class="text-3xl font-bold tracking-tight sm:text-4xl">El recorrido</h2>
+
+  <ol class="route relative mt-12">
+    {
+      stops.map((stop, i) => {
+        const single = stop.sessions.length === 1 ? stop.sessions[0] : null;
+        const cover = stop.sessions.find((s) => s.coverImageUrl)?.coverImageUrl;
+        const attendees = stop.sessions.reduce((sum, s) => sum + (s.attendeeCount ?? 0), 0);
+        return (
+          <li id={stop.key} class="stop relative grid scroll-mt-8 gap-x-10 gap-y-4 pb-16 pl-10 last:pb-0 md:grid-cols-[8.5rem_1fr]">
+            <span class="dot absolute top-2 left-0 size-[1.125rem] rounded-full border-4 bg-paper" style={`border-color: ${colorFor(i)}`} aria-hidden="true" />
+
+            <time datetime={isoDate(stop.date)} class="block md:pt-0.5">
+              <span class="tabular block text-6xl leading-none font-extrabold tracking-tight">{day(stop.date)}</span>
+              <span class="mt-1 block text-lg font-medium">{month(stop.date)} {stop.date.getFullYear()}</span>
+              <span class="block text-muted">{weekday(stop.date)}</span>
+            </time>
+
+            <article class="min-w-0">
+              {single && cover && (
+                <img
+                  src={cover}
+                  alt=""
+                  loading={i === 0 ? "eager" : "lazy"}
+                  class="mb-6 aspect-[4/1] w-full rounded-2xl bg-line object-cover"
+                />
+              )}
+
+              <h3 class="text-2xl leading-tight font-bold sm:text-[1.75rem]">{single ? single.title : stop.track}</h3>
+              {single?.description && <p class="mt-3 max-w-[64ch] text-muted">{single.description}</p>}
+
+              {single ? (
+                <>
+                  <dl class="mt-5 flex flex-wrap gap-x-8 gap-y-2">
+                    <div>
+                      <dt class="text-sm text-muted">Horario</dt>
+                      <dd class="tabular font-medium">{timeRange(single)}</dd>
+                    </div>
+                    {single.attendeeCount != null && (
+                      <div>
+                        <dt class="text-sm text-muted">Asistentes</dt>
+                        <dd class="tabular font-medium">{single.attendeeCount}</dd>
+                      </div>
+                    )}
+                    {venueName && (
+                      <div>
+                        <dt class="text-sm text-muted">Lugar</dt>
+                        <dd class="font-medium">{venueName}</dd>
+                      </div>
+                    )}
+                  </dl>
+
+                  {single.speakers.length > 0 && (
+                    <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-4" aria-label="Speakers">
+                      {single.speakers.map((sp) => (
+                        <li class="flex items-center gap-3">
+                          {sp.person.photoUrl ? (
+                            <img src={sp.person.photoUrl} alt="" loading="lazy" class="size-11 rounded-full bg-line object-cover" />
+                          ) : (
+                            <span class="grid size-11 place-items-center rounded-full bg-line font-bold" aria-hidden="true">
+                              {sp.person.name.charAt(0)}
+                            </span>
+                          )}
+                          <span class="leading-tight">
+                            <span class="block font-medium">{sp.person.name}</span>
+                            {sp.role && <span class="block text-sm text-muted">{sp.role}</span>}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {single.url && (
+                    <ExternalLink href={single.url} class="mt-7">
+                      Ver el evento en gdg.community.dev
+                    </ExternalLink>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p class="mt-4 font-medium">
+                    {stop.sessions.length} talleres el mismo día, <span class="tabular">{attendees}</span> asistentes en total
+                    {venueName && <> en {venueName}</>}.
+                  </p>
+                  <ul class="mt-6 space-y-8">
+                    {stop.sessions.map((s) => (
+                      <li>
+                        {s.coverImageUrl && (
+                          <img src={s.coverImageUrl} alt="" loading="lazy" class="aspect-[4/1] w-full rounded-2xl bg-line object-cover" />
+                        )}
+                        <div class="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                          <h4 class="text-xl font-bold">{s.title.split("·").at(-1)?.trim()}</h4>
+                          <p class="tabular text-muted">
+                            <span>{timeRange(s)}</span>
+                            {s.attendeeCount != null && <span class="ml-4">{s.attendeeCount} asistentes</span>}
+                          </p>
+                        </div>
+                        {s.description && <p class="mt-1 max-w-[64ch]">{s.description}</p>}
+                        {s.url && (
+                          <ExternalLink href={s.url} compact class="mt-3" label={`Ver ${s.title} en gdg.community.dev`}>
+                            Ver en gdg.community.dev
+                          </ExternalLink>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  {organizers.length > 0 && (
+                    <p class="mt-4 text-sm text-muted">
+                      Los talleres los facilitó el <a href="#equipo" class="text-link underline-offset-4 hover:underline">equipo organizador</a>.
+                    </p>
+                  )}
+                </>
+              )}
+            </article>
+          </li>
+        );
+      })
+    }
+  </ol>
+</section>
+
+<style>
+  .route::before {
+    content: "";
+    position: absolute;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    left: calc(1.125rem / 2 - 1.5px);
+    width: 3px;
+    border-radius: 3px;
+    background: var(--route-gradient-vertical);
+  }
+</style>

@@ -1,0 +1,123 @@
+---
+import { longDate, day, month, type EventInfo, type Stop } from "../lib/event";
+
+interface Props {
+  event: EventInfo;
+  stops: Stop[];
+  totalAttendees: number;
+  sessionCount: number;
+}
+const { event, stops, totalAttendees, sessionCount } = Astro.props;
+
+const span = event.endDate.getTime() - event.startDate.getTime();
+const COLORS = ["var(--color-gemini-blue)", "var(--color-gemini-violet)", "var(--color-gemini-rose)"];
+const positions = stops.map((stop) =>
+  span > 0 ? Math.min(100, Math.max(0, ((stop.date.getTime() - event.startDate.getTime()) / span) * 100)) : 0,
+);
+const markers = stops.map((stop, i) => {
+  const isLast = i === stops.length - 1;
+  return {
+    stop,
+    pct: positions[i],
+    label: stop.sessions.length > 1 ? stop.track : stop.sessions[0].title,
+    color: COLORS[Math.round((i / Math.max(1, stops.length - 1)) * (COLORS.length - 1))],
+    isLast,
+    // Each label only uses the room up to the next stop, so close dates don't overlap.
+    room: isLast ? 0 : positions[i + 1] - positions[i],
+  };
+});
+---
+
+<section class="mx-auto max-w-6xl px-5 pt-16 pb-20 sm:px-8 sm:pt-24">
+  <h1 class="max-w-[12ch] text-[clamp(3.25rem,10vw,7.5rem)] leading-[0.92] font-extrabold tracking-[-0.035em]">
+    {event.name} {event.edition}
+  </h1>
+  <p class="mt-6 max-w-[34ch] text-xl leading-snug text-muted sm:text-2xl">{event.tagline}</p>
+
+  <div class="route-map mt-16" role="img" aria-label={`Recorrido: ${markers.map((m) => `${m.label}, ${longDate(m.stop.date)}`).join("; ")}`}>
+    <div class="relative h-3">
+      <div class="route-bar absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full"></div>
+      {
+        markers.map((m) => (
+          <a
+            href={`#${m.stop.key}`}
+            class="route-dot absolute top-1/2 block size-4 -translate-1/2 rounded-full border-[3px] bg-paper"
+            style={`left: ${m.pct}%; border-color: ${m.color}; --delay: ${(m.pct / 100) * 1.1}s`}
+            aria-label={`Ir a ${m.label}`}
+          />
+        ))
+      }
+    </div>
+
+    <ol class="relative mt-5 hidden h-20 md:block" aria-hidden="true">
+      {
+        markers.map((m) => (
+          <li
+            class:list={["absolute top-0 pr-4", m.isLast ? "w-48 -translate-x-full text-right" : "text-left"]}
+            style={m.isLast ? `left: ${m.pct}%` : `left: ${m.pct}%; width: min(${m.room}%, 18rem)`}
+          >
+            <span class="tabular block text-sm text-muted">
+              {day(m.stop.date)} {month(m.stop.date)}
+            </span>
+            <span class="block leading-tight font-medium">{m.label}</span>
+          </li>
+        ))
+      }
+    </ol>
+
+    <ol class="mt-6 space-y-3 md:hidden" aria-hidden="true">
+      {
+        markers.map((m) => (
+          <li class="flex items-baseline gap-3">
+            <span class="relative top-0.5 size-3 shrink-0 rounded-full border-[3px] bg-paper" style={`border-color: ${m.color}`} />
+            <span class="tabular w-16 shrink-0 text-sm text-muted">
+              {day(m.stop.date)} {month(m.stop.date)}
+            </span>
+            <span class="leading-tight font-medium">{m.label}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <p class="mt-14 max-w-[60ch] text-lg">
+    {totalAttendees} asistencias en {sessionCount} encuentros, del {longDate(event.startDate)} al {longDate(event.endDate)} de {event.edition}
+    {event.venue && <> en {event.venue.name}, {event.venue.city}</>}.
+  </p>
+</section>
+
+<style>
+  .route-bar {
+    background: var(--route-gradient);
+    transform-origin: left center;
+    animation: draw 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .route-dot {
+    animation: appear 0.3s ease-out both;
+    animation-delay: var(--delay);
+  }
+  @keyframes draw {
+    from {
+      scale: 0 1;
+    }
+    to {
+      scale: 1 1;
+    }
+  }
+  @keyframes appear {
+    from {
+      opacity: 0;
+      scale: 0.4;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .route-bar,
+    .route-dot {
+      animation: none;
+    }
+  }
+</style>
