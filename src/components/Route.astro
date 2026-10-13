@@ -87,8 +87,8 @@ const colorFor = (i: number) => COLORS[Math.round((i / Math.max(1, stops.length 
                   )}
 
                   {single.url && (
-                    <ExternalLink href={single.url} class="mt-7">
-                      Ver el evento en gdg.community.dev
+                    <ExternalLink href={single.url} class="mt-7" label={`Ver detalle de ${single.title} en gdg.community.dev`}>
+                      Ver detalle del evento
                     </ExternalLink>
                   )}
                 </>
@@ -113,8 +113,8 @@ const colorFor = (i: number) => COLORS[Math.round((i / Math.max(1, stops.length 
                         </div>
                         {s.description && <p class="mt-1 max-w-[64ch]">{s.description}</p>}
                         {s.url && (
-                          <ExternalLink href={s.url} compact class="mt-3" label={`Ver ${s.title} en gdg.community.dev`}>
-                            Ver en gdg.community.dev
+                          <ExternalLink href={s.url} compact class="mt-3" label={`Ver detalle de ${s.title} en gdg.community.dev`}>
+                            Ver detalle del taller
                           </ExternalLink>
                         )}
                       </li>
