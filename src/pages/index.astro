@@ -1,4 +1,5 @@
 ---
+import { getImage } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import Hero from "../components/Hero.astro";
 import Route from "../components/Route.astro";
@@ -9,9 +10,11 @@ import { loadEventPage } from "../lib/event";
 const page = await loadEventPage(import.meta.env.PUBLIC_EVENT_SLUG ?? "build-with-ai-2026");
 const { event, stops } = page;
 const cover = stops.at(-1)?.sessions.find((s) => s.coverImageUrl)?.coverImageUrl;
+// Link previews get a copy of the cover published with the site, not the Storage original.
+const ogImage = cover && new URL((await getImage({ src: cover, width: 1200, height: 300, format: "jpg" })).src, Astro.site).href;
 ---
 
-<Layout title={`${event.name} ${event.edition} · GDG Cochabamba`} description={event.description} image={cover}>
+<Layout title={`${event.name} ${event.edition} · GDG Cochabamba`} description={event.description} image={ogImage}>
   <header class="mx-auto flex max-w-6xl items-center justify-between px-5 pt-6 sm:px-8">
     <a href="https://gdg.com.bo" class="inline-flex items-center gap-3 font-bold">
       <img src="/gdg-icon.svg" alt="" class="h-7 w-auto" />

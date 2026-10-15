@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { Member } from "../lib/event";
 
 interface Props {
@@ -24,7 +25,7 @@ const initials = (name: string) =>
           {speakers.map((sp) => (
             <li>
               {sp.person.photoUrl ? (
-                <img src={sp.person.photoUrl} alt="" loading="lazy" class="aspect-square w-full max-w-40 rounded-full bg-line object-cover" />
+                <Image src={sp.person.photoUrl} alt="" width={160} height={160} densities={[1, 2]} class="aspect-square w-full max-w-40 rounded-full bg-line object-cover" />
               ) : (
                 <span class="grid aspect-square w-full max-w-40 place-items-center rounded-full bg-line text-3xl font-bold" aria-hidden="true">
                   {initials(sp.person.name)}
@@ -50,7 +51,7 @@ const initials = (name: string) =>
           {organizers.map((o) => (
             <li class="flex items-center gap-4">
               {o.person.photoUrl ? (
-                <img src={o.person.photoUrl} alt="" loading="lazy" class="size-14 shrink-0 rounded-full bg-line object-cover" />
+                <Image src={o.person.photoUrl} alt="" width={56} height={56} densities={[1, 2]} class="size-14 shrink-0 rounded-full bg-line object-cover" />
               ) : (
                 <span class="grid size-14 shrink-0 place-items-center rounded-full bg-line font-bold" aria-hidden="true">
                   {initials(o.person.name)}
