@@ -15,7 +15,9 @@ export function getDb(): Firestore {
         messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
         appId: import.meta.env.PUBLIC_FIREBASE_APP_ID,
       });
-    db = getFirestore(app);
+    // Build with AI 2026 is a past event: its data is frozen in the read-only
+    // "legacy" database of gdg-cbba-bo. New events live in the (default) database.
+    db = getFirestore(app, "legacy");
   }
   return db;
 }
